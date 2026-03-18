@@ -8,6 +8,21 @@ const DEFAULT_AXES = [
   { label: 'Reflection',    value: 55 },
 ]
 
+// Pre-built frameworks. Axis values are normalised 0–100.
+const FRAMEWORKS = {
+  digcomp: {
+    name: 'DigComp 3.0',
+    scale: 10,
+    axes: [
+      { label: 'Information & data', value: 50 },
+      { label: 'Communication',      value: 50 },
+      { label: 'Content creation',   value: 50 },
+      { label: 'Safety',             value: 50 },
+      { label: 'Problem solving',    value: 50 },
+    ],
+  },
+}
+
 let palette = 'nord'
 let scale = 100   // 10 or 100
 
@@ -83,6 +98,23 @@ function initAxesList() {
   for (const axis of DEFAULT_AXES) list.appendChild(createAxisRow(axis))
 }
 
+function loadFramework(key) {
+  const list    = document.getElementById('axes-list')
+  const scaleEl = document.getElementById('scale-select')
+  const axes    = key ? FRAMEWORKS[key].axes : DEFAULT_AXES
+  const newScale = key ? FRAMEWORKS[key].scale : 100
+
+  // Update scale variable and select
+  scale = newScale
+  scaleEl.value = String(newScale)
+
+  // Replace axes
+  list.innerHTML = ''
+  for (const axis of axes) list.appendChild(createAxisRow(axis))
+  updateRemoveButtons()
+  render()
+}
+
 // ── Download ───────────────────────────────────────────────────────────────────
 
 const anchor = document.getElementById('dl-anchor')
@@ -127,6 +159,10 @@ export function initStudio() {
 
   initAxesList()
   updateRemoveButtons()
+
+  document.getElementById('framework-select').addEventListener('change', e => {
+    loadFramework(e.target.value || null)
+  })
 
   document.getElementById('add-axis').addEventListener('click', () => {
     const list = document.getElementById('axes-list')
