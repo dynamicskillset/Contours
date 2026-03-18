@@ -152,17 +152,15 @@ function triggerDownload(objectUrl, filename) {
 }
 
 function downloadSVG() {
-  const el = document.querySelector('#output svg')
-  if (!el) return
-  const src = new XMLSerializer().serializeToString(el)
+  const src = renderContour(readAxes(), palette, true)
+  if (!src) return
   const blob = new Blob([src], { type: 'image/svg+xml' })
   triggerDownload(URL.createObjectURL(blob), 'contour.svg')
 }
 
 function downloadPNG() {
-  const el = document.querySelector('#output svg')
-  if (!el) return
-  const src = new XMLSerializer().serializeToString(el)
+  const src = renderContour(readAxes(), palette, true)
+  if (!src) return
   const svgUrl = URL.createObjectURL(new Blob([src], { type: 'image/svg+xml' }))
   const img = new Image()
   img.onload = () => {

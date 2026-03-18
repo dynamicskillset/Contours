@@ -65,7 +65,7 @@ function splitLabel(text) {
  * @param {string} palette  — key of PALETTES
  * @returns {string}  SVG markup
  */
-export function renderContour(axes, palette = 'nord') {
+export function renderContour(axes, palette = 'nord', attribution = false) {
   if (!axes || axes.length < 3) return ''
 
   const n = axes.length
@@ -146,8 +146,10 @@ export function renderContour(axes, palette = 'nord') {
     }
   }
 
-  // Attribution
-  parts.push(`<text x="${CX}" y="${SVG_SIZE - 14}" text-anchor="middle" font-family="system-ui, sans-serif" font-size="9" fill="${colors.guide}" opacity="0.5">dynamicskillset.com/contours</text>`)
+  // Attribution (exports only)
+  if (attribution) {
+    parts.push(`<text x="${CX}" y="${SVG_SIZE - 14}" text-anchor="middle" font-family="system-ui, sans-serif" font-size="9" fill="${colors.guide}" opacity="0.5">dynamicskillset.com/contours</text>`)
+  }
 
   parts.push('</svg>')
   return parts.join('\n')
