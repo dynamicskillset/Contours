@@ -1,6 +1,6 @@
 {
   "name": "contours",
-  "version": "0.5.0",
+  "version": "0.9.0",
   "description": "Topographic skills-profile visualiser for Open Badges",
   "scripts": {
     "dev": "vite",
