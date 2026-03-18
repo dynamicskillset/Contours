@@ -270,6 +270,12 @@ select:focus-visible {
   outline-offset: 2px;
 }
 
+.btn-primary:disabled,
+.btn-secondary:disabled {
+  opacity: 0.35;
+  cursor: not-allowed;
+}
+
 .btn-secondary {
   background: transparent;
   color: var(--color-accent);

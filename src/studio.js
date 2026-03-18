@@ -23,8 +23,11 @@ const FRAMEWORKS = {
   },
 }
 
+const MIN_AXES = 3
+const MAX_AXES = 8
+
 let palette = 'nord'
-let scale = 100   // 10 or 100
+let scale = 100   // 8, 10, or 100
 
 // ── Rendering ──────────────────────────────────────────────────────────────────
 
@@ -49,10 +52,15 @@ function render() {
 
 function updateRemoveButtons() {
   const rows = document.querySelectorAll('.axis-row')
-  const atMin = rows.length <= 3
+  const atMin = rows.length <= MIN_AXES
   rows.forEach(row => {
     row.querySelector('.remove-axis').disabled = atMin
   })
+}
+
+function updateAddButton() {
+  const atMax = document.querySelectorAll('.axis-row').length >= MAX_AXES
+  document.getElementById('add-axis').disabled = atMax
 }
 
 // axis.value is always normalised 0–100; convert to current scale for display
@@ -89,6 +97,7 @@ function createAxisRow(axis) {
     row.remove()
     render()
     updateRemoveButtons()
+    updateAddButton()
   })
   return row
 }
@@ -99,19 +108,23 @@ function initAxesList() {
 }
 
 function loadFramework(key) {
-  const list    = document.getElementById('axes-list')
-  const scaleEl = document.getElementById('scale-select')
-  const axes    = key ? FRAMEWORKS[key].axes : DEFAULT_AXES
+  const list     = document.getElementById('axes-list')
+  const scaleEl  = document.getElementById('scale-select')
+  const template = key ? FRAMEWORKS[key].axes : DEFAULT_AXES
   const newScale = key ? FRAMEWORKS[key].scale : 100
 
   // Update scale variable and select
   scale = newScale
   scaleEl.value = String(newScale)
 
-  // Replace axes
+  // Replace axes — randomise values when loading a framework for an interesting shape
   list.innerHTML = ''
-  for (const axis of axes) list.appendChild(createAxisRow(axis))
+  for (const axis of template) {
+    const value = key ? Math.round(10 + Math.random() * 85) : axis.value
+    list.appendChild(createAxisRow({ label: axis.label, value }))
+  }
   updateRemoveButtons()
+  updateAddButton()
   render()
 }
 
@@ -159,6 +172,7 @@ export function initStudio() {
 
   initAxesList()
   updateRemoveButtons()
+  updateAddButton()
 
   document.getElementById('framework-select').addEventListener('change', e => {
     loadFramework(e.target.value || null)
@@ -169,6 +183,7 @@ export function initStudio() {
     list.appendChild(createAxisRow({ label: 'New axis', value: 50 }))
     render()
     updateRemoveButtons()
+    updateAddButton()
   })
 
   document.getElementById('palette-select').addEventListener('change', e => {
