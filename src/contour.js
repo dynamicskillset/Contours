@@ -2,7 +2,7 @@
 // Called from studio.js with axes data and a palette name.
 
 const SVG_SIZE = 512
-const PAD = 48          // extra space around the chart so labels don't clip
+const PAD = 64          // extra space around the chart so labels don't clip
 const CX = 256
 const CY = 256
 const MAX_R = 185       // leave room for axis labels at the edge

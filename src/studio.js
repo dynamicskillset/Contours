@@ -70,12 +70,12 @@ function createAxisRow(axis) {
   const row = document.createElement('div')
   row.className = 'axis-row'
   row.innerHTML = `
-    <input class="axis-label" type="text" value="${escAttr(axis.label)}" maxlength="24" aria-label="${escAttr(axis.label)} — dimension name">
-    <div class="axis-controls">
-      <input class="axis-value" type="range" min="0" max="${scale}" value="${displayValue}" aria-label="${escAttr(axis.label)} value, 0 to ${scale}" data-normalized="${axis.value}">
+    <div class="axis-header">
+      <input class="axis-label" type="text" value="${escAttr(axis.label)}" maxlength="24" aria-label="${escAttr(axis.label)} — dimension name">
       <span class="axis-value-display" aria-hidden="true">${displayValue}</span>
+      <button class="remove-axis" type="button" aria-label="Remove ${escAttr(axis.label)} dimension" title="Remove">×</button>
     </div>
-    <button class="remove-axis" type="button" aria-label="Remove ${escAttr(axis.label)} dimension" title="Remove">×</button>
+    <input class="axis-value" type="range" min="0" max="${scale}" value="${displayValue}" aria-label="${escAttr(axis.label)} value, 0 to ${scale}" data-normalized="${axis.value}">
   `
   const labelInput = row.querySelector('.axis-label')
   const slider     = row.querySelector('.axis-value')
