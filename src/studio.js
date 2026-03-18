@@ -13,6 +13,8 @@ let scale = 100   // 10 or 100
 
 // ── Rendering ──────────────────────────────────────────────────────────────────
 
+let outputEl, outputActionsEl  // cached at init
+
 function readAxes() {
   return Array.from(document.querySelectorAll('.axis-row')).map(row => ({
     label: row.querySelector('.axis-label').value.trim() || 'Axis',
@@ -24,11 +26,19 @@ function readAxes() {
 function render() {
   const axes = readAxes()
   const svg = renderContour(axes, palette)
-  document.getElementById('output').innerHTML = svg
-  document.getElementById('output-actions').classList.toggle('hidden', !svg)
+  outputEl.innerHTML = svg
+  outputActionsEl.classList.toggle('hidden', !svg)
 }
 
 // ── Axis rows ──────────────────────────────────────────────────────────────────
+
+function updateRemoveButtons() {
+  const rows = document.querySelectorAll('.axis-row')
+  const atMin = rows.length <= 3
+  rows.forEach(row => {
+    row.querySelector('.remove-axis').disabled = atMin
+  })
+}
 
 // axis.value is always normalised 0–100; convert to current scale for display
 function createAxisRow(axis) {
@@ -36,25 +46,34 @@ function createAxisRow(axis) {
   const row = document.createElement('div')
   row.className = 'axis-row'
   row.innerHTML = `
-    <input class="axis-label" type="text" value="${escAttr(axis.label)}" maxlength="24" aria-label="Axis label">
+    <input class="axis-label" type="text" value="${escAttr(axis.label)}" maxlength="24" aria-label="${escAttr(axis.label)} — axis name">
     <div class="axis-controls">
-      <input class="axis-value" type="range" min="0" max="${scale}" value="${displayValue}" aria-label="Value 0 to ${scale}" data-normalized="${axis.value}">
-      <span class="axis-value-display">${displayValue}</span>
+      <input class="axis-value" type="range" min="0" max="${scale}" value="${displayValue}" aria-label="${escAttr(axis.label)} value, 0 to ${scale}" data-normalized="${axis.value}">
+      <span class="axis-value-display" aria-hidden="true">${displayValue}</span>
     </div>
-    <button class="remove-axis" type="button" aria-label="Remove axis" title="Remove">×</button>
+    <button class="remove-axis" type="button" aria-label="Remove ${escAttr(axis.label)} axis" title="Remove">×</button>
   `
-  const slider  = row.querySelector('.axis-value')
-  const display = row.querySelector('.axis-value-display')
+  const labelInput = row.querySelector('.axis-label')
+  const slider     = row.querySelector('.axis-value')
+  const display    = row.querySelector('.axis-value-display')
+  const removeBtn  = row.querySelector('.remove-axis')
+
   slider.addEventListener('input', () => {
     display.textContent = slider.value
     slider.dataset.normalized = Math.round((parseInt(slider.value, 10) / scale) * 100)
     render()
   })
-  row.querySelector('.axis-label').addEventListener('input', render)
-  row.querySelector('.remove-axis').addEventListener('click', () => {
-    if (document.querySelectorAll('.axis-row').length <= 3) return
+  labelInput.addEventListener('input', () => {
+    const name = labelInput.value.trim() || 'Axis'
+    labelInput.setAttribute('aria-label', `${name} — axis name`)
+    slider.setAttribute('aria-label', `${name} value, 0 to ${scale}`)
+    removeBtn.setAttribute('aria-label', `Remove ${name} axis`)
+    render()
+  })
+  removeBtn.addEventListener('click', () => {
     row.remove()
     render()
+    updateRemoveButtons()
   })
   return row
 }
@@ -72,6 +91,7 @@ function triggerDownload(objectUrl, filename) {
   anchor.href = objectUrl
   anchor.download = filename
   anchor.click()
+  setTimeout(() => URL.revokeObjectURL(objectUrl), 100)
 }
 
 function downloadSVG() {
@@ -90,8 +110,8 @@ function downloadPNG() {
   const img = new Image()
   img.onload = () => {
     const canvas = document.createElement('canvas')
-    canvas.width = 512
-    canvas.height = 512
+    canvas.width = 608
+    canvas.height = 608
     canvas.getContext('2d').drawImage(img, 0, 0)
     URL.revokeObjectURL(svgUrl)
     canvas.toBlob(blob => triggerDownload(URL.createObjectURL(blob), 'contour.png'), 'image/png')
@@ -102,12 +122,17 @@ function downloadPNG() {
 // ── Init ───────────────────────────────────────────────────────────────────────
 
 export function initStudio() {
+  outputEl        = document.getElementById('output')
+  outputActionsEl = document.getElementById('output-actions')
+
   initAxesList()
+  updateRemoveButtons()
 
   document.getElementById('add-axis').addEventListener('click', () => {
     const list = document.getElementById('axes-list')
     list.appendChild(createAxisRow({ label: 'New axis', value: 50 }))
     render()
+    updateRemoveButtons()
   })
 
   document.getElementById('palette-select').addEventListener('change', e => {
@@ -119,13 +144,15 @@ export function initStudio() {
     const newScale = parseInt(e.target.value, 10)
     // Rescale all existing sliders to the new range, preserving normalised values
     document.querySelectorAll('.axis-row').forEach(row => {
-      const slider  = row.querySelector('.axis-value')
-      const display = row.querySelector('.axis-value-display')
+      const slider     = row.querySelector('.axis-value')
+      const display    = row.querySelector('.axis-value-display')
+      const label      = row.querySelector('.axis-label').value.trim() || 'Axis'
       const normalized = parseInt(slider.dataset.normalized, 10)
-      slider.max = newScale
+      slider.max   = newScale
       const newVal = Math.round((normalized / 100) * newScale)
       slider.value = newVal
       display.textContent = newVal
+      slider.setAttribute('aria-label', `${label} value, 0 to ${newScale}`)
     })
     scale = newScale
     render()

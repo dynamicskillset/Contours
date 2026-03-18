@@ -21,6 +21,7 @@
   --color-accent:         var(--nord10);
   --color-accent-dark:    color-mix(in oklch, var(--nord10) 80%, black);
   --color-accent-focus:   color-mix(in srgb, var(--nord10) 20%, transparent);
+  --color-on-accent:      var(--nord6);
 
   /* Typography */
   --font-family:  'Plus Jakarta Sans', system-ui, -apple-system, sans-serif;
@@ -146,6 +147,7 @@ select {
   width: 100%;
 }
 
+
 select:focus-visible {
   outline: 2px solid var(--color-accent);
   outline-offset: 1px;
@@ -206,8 +208,8 @@ select:focus-visible {
 
 .remove-axis {
   flex-shrink: 0;
-  width: 1.6em;
-  height: 1.6em;
+  min-width: 2.75rem;
+  min-height: 2.75rem;
   padding: 0;
   display: flex;
   align-items: center;
@@ -230,6 +232,13 @@ select:focus-visible {
   outline: none;
 }
 
+.remove-axis:disabled {
+  opacity: 0.35;
+  cursor: not-allowed;
+  border-color: var(--color-border);
+  color: var(--color-text-secondary);
+}
+
 /* ── Buttons ── */
 .btn-primary,
 .btn-secondary {
@@ -247,7 +256,7 @@ select:focus-visible {
 
 .btn-primary {
   background: var(--color-accent);
-  color: var(--nord6);
+  color: var(--color-on-accent);
   border: none;
 }
 
@@ -286,7 +295,7 @@ select:focus-visible {
 }
 
 #output {
-  width: min(512px, calc(100vh - 16rem));
+  width: min(512px, calc(100dvh - 16rem));
   aspect-ratio: 1;
 }
 

@@ -2,6 +2,7 @@
 // Called from studio.js with axes data and a palette name.
 
 const SVG_SIZE = 512
+const PAD = 48          // extra space around the chart so labels don't clip
 const CX = 256
 const CY = 256
 const MAX_R = 185       // leave room for axis labels at the edge
@@ -58,9 +59,13 @@ export function renderContour(axes, palette = 'nord') {
   const angleStep = 360 / n
   const colors = PALETTES[palette] || PALETTES.nord
 
+  const titleText = 'Skills profile: ' + axes.map(a => `${a.label} ${a.value}%`).join(', ')
+
   const parts = []
-  parts.push(`<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 ${SVG_SIZE} ${SVG_SIZE}">`)
-  parts.push(`<rect width="${SVG_SIZE}" height="${SVG_SIZE}" fill="${colors.bg}"/>`)
+  const VB = SVG_SIZE + PAD * 2   // 608
+  parts.push(`<svg xmlns="http://www.w3.org/2000/svg" viewBox="${-PAD} ${-PAD} ${VB} ${VB}" role="img" aria-labelledby="contour-title">`)
+  parts.push(`<title id="contour-title">${escXml(titleText)}</title>`)
+  parts.push(`<rect x="${-PAD}" y="${-PAD}" width="${VB}" height="${VB}" fill="${colors.bg}"/>`)
 
   // Guide circles at each contour level
   for (const level of LEVELS) {
@@ -111,7 +116,7 @@ export function renderContour(axes, palette = 'nord') {
     const sinA = Math.sin(rad)
     const anchor = cosA > 0.15 ? 'start' : cosA < -0.15 ? 'end' : 'middle'
     const dy = sinA < -0.7 ? '-0.3em' : sinA > 0.7 ? '1em' : '0.35em'
-    parts.push(`<text x="${fmt(pt.x)}" y="${fmt(pt.y)}" dy="${dy}" text-anchor="${anchor}" font-family="system-ui, sans-serif" font-size="12" font-weight="600" fill="${colors.label}">${escXml(axes[i].label)}</text>`)
+    parts.push(`<text x="${fmt(pt.x)}" y="${fmt(pt.y)}" dy="${dy}" text-anchor="${anchor}" font-family="system-ui, sans-serif" font-size="14" font-weight="600" fill="${colors.label}">${escXml(axes[i].label)}</text>`)
   }
 
   parts.push('</svg>')
@@ -119,8 +124,8 @@ export function renderContour(axes, palette = 'nord') {
 }
 
 export const PALETTES = {
-  nord:   { bg: '#ECEFF4', guide: '#4C566A', stroke: '#5E81AC', fill: '#5E81AC', label: '#2E3440' },
-  ocean:  { bg: '#EDF4F8', guide: '#2C5F7A', stroke: '#29A7C5', fill: '#29A7C5', label: '#0D2E3A' },
-  forest: { bg: '#F0F4F0', guide: '#3D5C3D', stroke: '#5A9E5A', fill: '#5A9E5A', label: '#1B2E1B' },
-  wao:    { bg: '#F0F5F7', guide: '#2F495A', stroke: '#00C399', fill: '#00C399', label: '#2F495A' },
+  nord:   { bg: '#F9FAFC', guide: '#4C566A', stroke: '#5E81AC', fill: '#5E81AC', label: '#2E3440' },
+  ocean:  { bg: '#F9FAFC', guide: '#2C5F7A', stroke: '#29A7C5', fill: '#29A7C5', label: '#0D2E3A' },
+  forest: { bg: '#F9FAFC', guide: '#3D5C3D', stroke: '#5A9E5A', fill: '#5A9E5A', label: '#1B2E1B' },
+  wao:    { bg: '#F9FAFC', guide: '#2F495A', stroke: '#00C399', fill: '#00C399', label: '#2F495A' },
 }
