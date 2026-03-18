@@ -12,6 +12,7 @@ const DEFAULT_AXES = [
 const FRAMEWORKS = {
   digcomp: {
     name: 'DigComp 3.0',
+    url: 'https://joint-research-centre.ec.europa.eu/projects-and-activities/education-and-training/digital-transformation-education/digital-competence-framework-digcomp/digcomp-30_en',
     scale: 8,
     axes: [
       { label: 'Information & data', value: 50 },
@@ -108,10 +109,21 @@ function initAxesList() {
 }
 
 function loadFramework(key) {
-  const list     = document.getElementById('axes-list')
-  const scaleEl  = document.getElementById('scale-select')
-  const template = key ? FRAMEWORKS[key].axes : DEFAULT_AXES
-  const newScale = key ? FRAMEWORKS[key].scale : 100
+  const list      = document.getElementById('axes-list')
+  const scaleEl   = document.getElementById('scale-select')
+  const linkRow   = document.getElementById('framework-link-row')
+  const linkEl    = document.getElementById('framework-link')
+  const fw        = key ? FRAMEWORKS[key] : null
+
+  // Show or hide the framework info link
+  if (fw && fw.url) {
+    linkEl.href = fw.url
+    linkRow.classList.remove('hidden')
+  } else {
+    linkRow.classList.add('hidden')
+  }
+  const template = fw ? fw.axes : DEFAULT_AXES
+  const newScale = fw ? fw.scale : 100
 
   // Update scale variable and select
   scale = newScale
@@ -120,7 +132,7 @@ function loadFramework(key) {
   // Replace axes — randomise values when loading a framework for an interesting shape
   list.innerHTML = ''
   for (const axis of template) {
-    const value = key ? Math.round(10 + Math.random() * 85) : axis.value
+    const value = fw ? Math.round(10 + Math.random() * 85) : axis.value
     list.appendChild(createAxisRow({ label: axis.label, value }))
   }
   updateRemoveButtons()

@@ -154,6 +154,21 @@ select:focus-visible {
   border-color: var(--color-accent);
 }
 
+/* ── Framework link ── */
+.framework-link {
+  margin: -0.5em 0 1em;
+}
+
+.framework-link-anchor {
+  font-size: var(--text-sm);
+  color: var(--color-accent);
+  text-decoration: none;
+}
+
+.framework-link-anchor:hover {
+  text-decoration: underline;
+}
+
 /* ── Axis rows ── */
 #axes-list {
   margin-bottom: 0.5rem;
