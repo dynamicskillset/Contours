@@ -340,7 +340,7 @@ select:focus-visible {
   align-items: center;
 }
 
-#output-actions.hidden {
+.hidden {
   display: none;
 }
 
