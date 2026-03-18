@@ -12,7 +12,7 @@ const DEFAULT_AXES = [
 const FRAMEWORKS = {
   digcomp: {
     name: 'DigComp 3.0',
-    scale: 10,
+    scale: 8,
     axes: [
       { label: 'Information & data', value: 50 },
       { label: 'Communication',      value: 50 },
