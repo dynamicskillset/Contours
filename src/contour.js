@@ -146,6 +146,9 @@ export function renderContour(axes, palette = 'nord') {
     }
   }
 
+  // Attribution
+  parts.push(`<text x="${CX}" y="${SVG_SIZE - 14}" text-anchor="middle" font-family="system-ui, sans-serif" font-size="9" fill="${colors.guide}" opacity="0.5">dynamicskillset.com/contours</text>`)
+
   parts.push('</svg>')
   return parts.join('\n')
 }
