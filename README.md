@@ -30,4 +30,4 @@ Built with vanilla JS and [Vite](https://vitejs.dev). No frameworks.
 
 [Mozilla Public License, v2.0](https://www.mozilla.org/en-US/MPL/2.0/)
 
-A [Dynamic Skillset](https://dynamicskillset.com) tool.
+A [Dynamic Skillset](https://dynamicskillset.com) tool. Shares design language and deployment infrastructure with [Badge Studio](https://github.com/dynamicskillset/badge-studio).
