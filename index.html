@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="description" content="Map your skills as topographic contour lines. A visualiser for Open Badge competency profiles.">
+    <link rel="preconnect" href="https://fonts.bunny.net" crossorigin>
+    <link rel="stylesheet" href="https://fonts.bunny.net/css2?family=Lora:wght@600&family=Plus+Jakarta+Sans:wght@400;600&display=swap">
+    <title>Contours</title>
+  </head>
+  <body>
+    <div class="wrapper">
+      <header class="header">
+        <h1 class="title">Contours</h1>
+      </header>
+
+      <div class="content" id="studio">
+        <form id="input">
+          <h2 class="subtitle">Configuration</h2>
+
+          <label class="label" for="palette-select">Colour Palette</label>
+          <p class="item">
+            <select name="palette" id="palette-select">
+              <option value="nord">Nord</option>
+              <option value="ocean">Ocean</option>
+              <option value="forest">Forest</option>
+              <option value="wao">WAO</option>
+            </select>
+          </p>
+
+          <label class="label" for="scale-select">Value Scale</label>
+          <p class="item">
+            <select name="scale" id="scale-select">
+              <option value="100">0–100</option>
+              <option value="10">0–10</option>
+            </select>
+          </p>
+
+          <p class="label">Axes <span class="label-hint">(min 3)</span></p>
+          <div id="axes-list"></div>
+
+          <p class="item">
+            <button type="button" id="add-axis" class="btn-secondary">+ Add axis</button>
+          </p>
+        </form>
+
+        <div id="output-area">
+          <div id="output"></div>
+          <div id="output-actions" class="hidden">
+            <button type="button" id="download-svg-btn" class="btn-secondary">Download SVG</button>
+            <button type="button" id="download-png-btn" class="btn-primary">Download PNG</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <footer class="footer">
+      <span class="footer-version">v0.1.0</span>
+      <span class="footer-sep">·</span>
+      <a href="https://dynamicskillset.com" target="_blank" rel="noopener" class="footer-link">A Dynamic Skillset tool</a>
+      <span class="footer-sep">·</span>
+      <a href="https://github.com/dynamicskillset/contours" target="_blank" rel="noopener" class="footer-link">Mozilla Public License, v2.0</a>
+    </footer>
+
+    <!-- Off-screen anchor for programmatic downloads -->
+    <a id="dl-anchor" style="display:none" aria-hidden="true"></a>
+
+    <script type="module" src="/src/main.js"></script>
+  </body>
+</html>
