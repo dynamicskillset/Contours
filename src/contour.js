@@ -151,8 +151,11 @@ export function renderContour(axes, palette = 'nord') {
 }
 
 export const PALETTES = {
-  nord:   { bg: '#F9FAFC', guide: '#4C566A', stroke: '#5E81AC', fill: '#5E81AC', label: '#2E3440' },
-  ocean:  { bg: '#F9FAFC', guide: '#2C5F7A', stroke: '#29A7C5', fill: '#29A7C5', label: '#0D2E3A' },
-  forest: { bg: '#F9FAFC', guide: '#3D5C3D', stroke: '#5A9E5A', fill: '#5A9E5A', label: '#1B2E1B' },
+  frost:  { bg: '#F9FAFC', guide: '#4C566A', stroke: '#5E81AC', fill: '#5E81AC', label: '#2E3440' },  // nord10
+  red:    { bg: '#F9FAFC', guide: '#4C566A', stroke: '#BF616A', fill: '#BF616A', label: '#2E3440' },  // nord11
+  orange: { bg: '#F9FAFC', guide: '#4C566A', stroke: '#D08770', fill: '#D08770', label: '#2E3440' },  // nord12
+  yellow: { bg: '#F9FAFC', guide: '#4C566A', stroke: '#EBCB8B', fill: '#EBCB8B', label: '#2E3440' },  // nord13
+  green:  { bg: '#F9FAFC', guide: '#4C566A', stroke: '#A3BE8C', fill: '#A3BE8C', label: '#2E3440' },  // nord14
+  purple: { bg: '#F9FAFC', guide: '#4C566A', stroke: '#B48EAD', fill: '#B48EAD', label: '#2E3440' },  // nord15
   wao:    { bg: '#F9FAFC', guide: '#2F495A', stroke: '#00C399', fill: '#00C399', label: '#2F495A' },
 }

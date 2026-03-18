@@ -27,7 +27,7 @@ const FRAMEWORKS = {
 const MIN_AXES = 3
 const MAX_AXES = 8
 
-let palette = 'nord'
+let palette = 'frost'
 let scale = 100   // 8, 10, or 100
 
 // ── Rendering ──────────────────────────────────────────────────────────────────
