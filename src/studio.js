@@ -167,9 +167,9 @@ function downloadPNG() {
   const img = new Image()
   img.onload = () => {
     const canvas = document.createElement('canvas')
-    canvas.width = 608
-    canvas.height = 608
-    canvas.getContext('2d').drawImage(img, 0, 0)
+    canvas.width = 2048
+    canvas.height = 2048
+    canvas.getContext('2d').drawImage(img, 0, 0, 2048, 2048)
     URL.revokeObjectURL(svgUrl)
     canvas.toBlob(blob => triggerDownload(URL.createObjectURL(blob), 'contour.png'), 'image/png')
   }
