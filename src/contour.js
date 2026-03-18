@@ -157,5 +157,4 @@ export const PALETTES = {
   yellow: { bg: '#F9FAFC', guide: '#4C566A', stroke: '#EBCB8B', fill: '#EBCB8B', label: '#2E3440' },  // nord13
   green:  { bg: '#F9FAFC', guide: '#4C566A', stroke: '#A3BE8C', fill: '#A3BE8C', label: '#2E3440' },  // nord14
   purple: { bg: '#F9FAFC', guide: '#4C566A', stroke: '#B48EAD', fill: '#B48EAD', label: '#2E3440' },  // nord15
-  wao:    { bg: '#F9FAFC', guide: '#2F495A', stroke: '#00C399', fill: '#00C399', label: '#2F495A' },
 }
