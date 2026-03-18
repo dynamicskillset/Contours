@@ -70,12 +70,12 @@ function createAxisRow(axis) {
   const row = document.createElement('div')
   row.className = 'axis-row'
   row.innerHTML = `
-    <input class="axis-label" type="text" value="${escAttr(axis.label)}" maxlength="24" aria-label="${escAttr(axis.label)} — axis name">
+    <input class="axis-label" type="text" value="${escAttr(axis.label)}" maxlength="24" aria-label="${escAttr(axis.label)} — dimension name">
     <div class="axis-controls">
       <input class="axis-value" type="range" min="0" max="${scale}" value="${displayValue}" aria-label="${escAttr(axis.label)} value, 0 to ${scale}" data-normalized="${axis.value}">
       <span class="axis-value-display" aria-hidden="true">${displayValue}</span>
     </div>
-    <button class="remove-axis" type="button" aria-label="Remove ${escAttr(axis.label)} axis" title="Remove">×</button>
+    <button class="remove-axis" type="button" aria-label="Remove ${escAttr(axis.label)} dimension" title="Remove">×</button>
   `
   const labelInput = row.querySelector('.axis-label')
   const slider     = row.querySelector('.axis-value')
@@ -89,7 +89,7 @@ function createAxisRow(axis) {
   })
   labelInput.addEventListener('input', () => {
     const name = labelInput.value.trim() || 'Axis'
-    labelInput.setAttribute('aria-label', `${name} — axis name`)
+    labelInput.setAttribute('aria-label', `${name} — dimension name`)
     slider.setAttribute('aria-label', `${name} value, 0 to ${scale}`)
     removeBtn.setAttribute('aria-label', `Remove ${name} axis`)
     render()
@@ -192,7 +192,7 @@ export function initStudio() {
 
   document.getElementById('add-axis').addEventListener('click', () => {
     const list = document.getElementById('axes-list')
-    list.appendChild(createAxisRow({ label: 'New axis', value: 50 }))
+    list.appendChild(createAxisRow({ label: 'New dimension', value: 50 }))
     render()
     updateRemoveButtons()
     updateAddButton()
