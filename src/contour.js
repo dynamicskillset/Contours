@@ -45,6 +45,19 @@ function escXml(s) {
     .replace(/"/g, '&quot;')
 }
 
+// Split a multi-word label into two lines at the most balanced word boundary.
+// Single-word labels are returned as-is in a one-element array.
+function splitLabel(text) {
+  const words = text.split(' ')
+  if (words.length <= 1) return [text]
+  let bestSplit = 1, bestDiff = Infinity
+  for (let i = 1; i < words.length; i++) {
+    const diff = Math.abs(words.slice(0, i).join(' ').length - words.slice(i).join(' ').length)
+    if (diff < bestDiff) { bestDiff = diff; bestSplit = i }
+  }
+  return [words.slice(0, bestSplit).join(' '), words.slice(bestSplit).join(' ')]
+}
+
 /**
  * Render a contour SVG from axes data.
  *
@@ -106,7 +119,7 @@ export function renderContour(axes, palette = 'nord') {
     parts.push(`<path d="${ringPaths[li]}" fill="none" stroke="${colors.stroke}" stroke-width="${strokeWidth}" stroke-opacity="${strokeOpacity}" stroke-linecap="round" stroke-linejoin="round"/>`)
   }
 
-  // Axis labels
+  // Axis labels — multi-word labels split across two lines to reduce horizontal overflow
   const LABEL_R = MAX_R + 24
   for (let i = 0; i < n; i++) {
     const angleDeg = i * angleStep
@@ -115,8 +128,22 @@ export function renderContour(axes, palette = 'nord') {
     const cosA = Math.cos(rad)
     const sinA = Math.sin(rad)
     const anchor = cosA > 0.15 ? 'start' : cosA < -0.15 ? 'end' : 'middle'
-    const dy = sinA < -0.7 ? '-0.3em' : sinA > 0.7 ? '1em' : '0.35em'
-    parts.push(`<text x="${fmt(pt.x)}" y="${fmt(pt.y)}" dy="${dy}" text-anchor="${anchor}" font-family="system-ui, sans-serif" font-size="14" font-weight="600" fill="${colors.label}">${escXml(axes[i].label)}</text>`)
+    // dy in em, used to vertically centre the label around the anchor point
+    const dyEm = sinA < -0.7 ? -0.3 : sinA > 0.7 ? 1.0 : 0.35
+    const textBase = `text-anchor="${anchor}" font-family="system-ui, sans-serif" font-size="14" font-weight="600" fill="${colors.label}"`
+    const lines = splitLabel(axes[i].label)
+    if (lines.length === 1) {
+      parts.push(`<text x="${fmt(pt.x)}" y="${fmt(pt.y)}" dy="${dyEm}em" ${textBase}>${escXml(lines[0])}</text>`)
+    } else {
+      // Shift first line up 0.6em so the pair is centred on the anchor point
+      const dy1 = (dyEm - 0.6).toFixed(2) + 'em'
+      parts.push(
+        `<text x="${fmt(pt.x)}" y="${fmt(pt.y)}" ${textBase}>` +
+        `<tspan x="${fmt(pt.x)}" dy="${dy1}">${escXml(lines[0])}</tspan>` +
+        `<tspan x="${fmt(pt.x)}" dy="1.2em">${escXml(lines[1])}</tspan>` +
+        `</text>`
+      )
+    }
   }
 
   parts.push('</svg>')
