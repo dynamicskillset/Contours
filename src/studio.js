@@ -88,6 +88,7 @@ function render() {
   outputEl.innerHTML = svg
   svgActionsEl.classList.toggle('hidden', !svg)
   renderOverlayLegend()
+  document.getElementById('welcome-hint').classList.toggle('hidden', snapshots.length > 0 || lastSavedAxes !== null)
   updateBadgeTab()
   updateBadgeDot()
 }
@@ -302,6 +303,10 @@ function truncate(text, max = 60) {
   return text.length > max ? text.slice(0, max - 1) + '\u2026' : text
 }
 
+function axesSummary(axes) {
+  return axes.map(a => `${a.label} ${a.value}`).join(' · ')
+}
+
 function safeUrl(url) {
   try {
     const u = new URL(url)
@@ -325,6 +330,7 @@ function renderTimeline() {
       <button type="button" class="timeline-btn" data-index="${i}">
         <span class="timeline-date">${escAttr(formatDate(snap.timestamp))}</span>
         <span class="timeline-desc">${escAttr(truncate(snap.description))}</span>
+        <span class="timeline-axes">${escAttr(axesSummary(snap.axes))}</span>
       </button>
       <button type="button" class="timeline-overlay-btn${isOverlaid ? ' is-overlaid' : ''}" data-overlay-index="${i}" title="${isOverlaid ? 'Hide overlay' : 'Show as overlay'}" aria-pressed="${isOverlaid}">◎</button>${linkHtml}
     </li>`

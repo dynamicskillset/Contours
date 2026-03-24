@@ -22,6 +22,7 @@
             <span id="preview-label"></span>
             <button type="button" id="exit-preview-btn" class="preview-exit-btn">Back to current</button>
           </div>
+          <div id="welcome-hint" class="welcome-hint hidden">Rename the dimensions on the right, then adjust the sliders to reflect your current skills.</div>
           <div id="output"></div>
           <div id="overlay-legend" class="overlay-legend hidden"></div>
           <div class="svg-actions hidden" id="svg-actions">
@@ -42,7 +43,7 @@
                     aria-controls="tab-settings" id="tab-btn-settings">Settings</button>
             <button class="tab-btn" role="tab" aria-selected="false"
                     aria-controls="tab-record" id="tab-btn-record">
-              Record<span class="tab-dot hidden" id="badge-tab-dot" aria-hidden="true"></span>
+              Journal<span class="tab-dot hidden" id="badge-tab-dot" aria-hidden="true"></span>
             </button>
             <button class="tab-btn" role="tab" aria-selected="false"
                     aria-controls="tab-export" id="tab-btn-export">Export</button>
@@ -152,9 +153,10 @@
             <div class="import-section">
               <p class="import-section-label">Returning user?</p>
               <p class="item">
-                <button type="button" id="import-trigger" class="btn-secondary import-btn">Load existing badge</button>
+                <button type="button" id="import-trigger" class="btn-secondary import-btn">Continue from saved file</button>
                 <input type="file" id="import-file" accept=".svg" class="file-input-hidden">
               </p>
+              <p class="import-section-hint">Load a previously exported badge to restore your profile and full snapshot history.</p>
             </div>
 
             <!-- Export as Open Badge -->
