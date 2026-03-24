@@ -65,9 +65,10 @@ function splitLabel(text) {
  * @param {string} palette  — key of PALETTES
  * @param {boolean} attribution  — include attribution text (exports only)
  * @param {object|null} credential  — OBv3 credential to bake in (exports only)
+ * @param {Array<{axes, palette}>} overlays  — additional snapshot shapes to layer behind (live preview only)
  * @returns {string}  SVG markup
  */
-export function renderContour(axes, palette = 'nord', attribution = false, credential = null) {
+export function renderContour(axes, palette = 'nord', attribution = false, credential = null, overlays = []) {
   if (!axes || axes.length < 3) return ''
 
   const n = axes.length
@@ -97,6 +98,17 @@ export function renderContour(axes, palette = 'nord', attribution = false, crede
 
   // Centre dot
   parts.push(`<circle cx="${CX}" cy="${CY}" r="2.5" fill="${colors.guide}" opacity="0.4"/>`)
+
+  // Overlay shapes — dashed outermost-ring silhouettes from historical snapshots
+  for (const ov of overlays) {
+    if (!ov.axes || ov.axes.length < 3) continue
+    const ovColors = PALETTES[ov.palette] || PALETTES.frost
+    const ovN = ov.axes.length
+    const ovStep = 360 / ovN
+    const ovPts = ov.axes.map((ax, i) => polar((ax.value / 100) * MAX_R, i * ovStep))
+    const ovPath = smoothClosedPath(ovPts)
+    parts.push(`<path d="${ovPath}" fill="${ovColors.fill}" fill-opacity="0.05" stroke="${ovColors.stroke}" stroke-width="1.5" stroke-dasharray="4 4" stroke-opacity="0.45" stroke-linecap="round"/>`)
+  }
 
   // Compute each ring's smooth path.
   // At level L, axis with value V contributes a point at min(V, L) % of MAX_R.

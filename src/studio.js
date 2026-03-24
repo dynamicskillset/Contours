@@ -34,9 +34,10 @@ let palette = 'frost'
 let scale   = 100   // 8, 10, or 100
 
 // Snapshot history
-let snapshots     = []    // { id, timestamp, description, url, axes, palette }
-let previewIndex  = -1    // -1 = live; 0+ = viewing historical snapshot
-let lastSavedAxes = null  // axes at last snapshot save; null = nothing saved yet
+let snapshots      = []    // { id, timestamp, description, url, axes, palette }
+let previewIndex   = -1    // -1 = live; 0+ = viewing historical snapshot
+let lastSavedAxes  = null  // axes at last snapshot save; null = nothing saved yet
+let overlayIndices = new Set()  // snapshot indices toggled on as overlay layers
 
 // ── Rendering ──────────────────────────────────────────────────────────────────
 
@@ -52,7 +53,10 @@ function readAxes() {
 function render() {
   const axes = previewIndex >= 0 ? snapshots[previewIndex].axes    : readAxes()
   const pal  = previewIndex >= 0 ? snapshots[previewIndex].palette : palette
-  const svg  = renderContour(axes, pal)
+  const overlays = [...overlayIndices]
+    .filter(i => i !== previewIndex)
+    .map(i => ({ axes: snapshots[i].axes, palette: snapshots[i].palette }))
+  const svg  = renderContour(axes, pal, false, null, overlays)
   outputEl.innerHTML = svg
   svgActionsEl.classList.toggle('hidden', !svg)
   updateBadgeTab()
@@ -281,17 +285,19 @@ function renderTimeline() {
   if (snapshots.length === 0) { el.innerHTML = ''; return }
 
   const items = snapshots.map((snap, i) => {
-    const isCurrent = i === snapshots.length - 1
-    const isActive  = i === previewIndex
-    const safe      = snap.url ? safeUrl(snap.url) : null
-    const linkHtml  = safe
+    const isCurrent  = i === snapshots.length - 1
+    const isActive   = i === previewIndex
+    const isOverlaid = overlayIndices.has(i)
+    const safe       = snap.url ? safeUrl(snap.url) : null
+    const linkHtml   = safe
       ? ` <a href="${escAttr(safe)}" target="_blank" rel="noopener" class="timeline-link" title="Supporting link">↗</a>`
       : ''
-    return `<li class="timeline-entry${isActive ? ' is-active' : ''}${isCurrent ? ' is-current' : ''}">
+    return `<li class="timeline-entry${isActive ? ' is-active' : ''}${isCurrent ? ' is-current' : ''}${isOverlaid ? ' is-overlaid' : ''}">
       <button type="button" class="timeline-btn" data-index="${i}">
         <span class="timeline-date">${escAttr(formatDate(snap.timestamp))}</span>
         <span class="timeline-desc">${escAttr(truncate(snap.description))}</span>
-      </button>${linkHtml}
+      </button>
+      <button type="button" class="timeline-overlay-btn${isOverlaid ? ' is-overlaid' : ''}" data-overlay-index="${i}" title="${isOverlaid ? 'Hide overlay' : 'Show as overlay'}" aria-pressed="${isOverlaid}">◎</button>${linkHtml}
     </li>`
   }).join('')
 
@@ -302,6 +308,16 @@ function renderTimeline() {
 
   el.querySelectorAll('.timeline-btn').forEach(btn => {
     btn.addEventListener('click', () => previewSnapshot(parseInt(btn.dataset.index, 10)))
+  })
+
+  el.querySelectorAll('.timeline-overlay-btn').forEach(btn => {
+    btn.addEventListener('click', () => {
+      const i = parseInt(btn.dataset.overlayIndex, 10)
+      if (overlayIndices.has(i)) overlayIndices.delete(i)
+      else overlayIndices.add(i)
+      render()
+      renderTimeline()
+    })
   })
 }
 
@@ -434,8 +450,9 @@ async function importBadge(file) {
   document.getElementById('badge-issuer-name').value = parsed.issuerName || 'Dynamic Skillset'
   document.getElementById('badge-issuer-url').value  = parsed.issuerUrl  || 'https://dynamicskillset.com'
 
-  snapshots    = parsed.snapshots
-  previewIndex = -1
+  snapshots      = parsed.snapshots
+  previewIndex   = -1
+  overlayIndices = new Set()
 
   if (snapshots.length > 0) {
     const latest = snapshots[snapshots.length - 1]

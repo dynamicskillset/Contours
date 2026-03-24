@@ -586,6 +586,26 @@ select:focus-visible {
   max-width: 100%;
 }
 
+.timeline-overlay-btn {
+  flex-shrink: 0;
+  padding: 0.35rem 0.4rem;
+  background: none;
+  border: none;
+  cursor: pointer;
+  font-size: 0.85rem;
+  color: var(--color-border);
+  line-height: 1;
+  transition: color 0.15s ease;
+}
+
+.timeline-overlay-btn:hover {
+  color: var(--color-accent);
+}
+
+.timeline-overlay-btn.is-overlaid {
+  color: var(--color-accent);
+}
+
 .timeline-link {
   flex-shrink: 0;
   padding: 0.4rem 0.5rem;
