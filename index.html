@@ -132,7 +132,10 @@
             </div>
 
             <!-- No unsaved changes -->
-            <p id="no-changes-block" class="no-changes-text hidden">No unsaved changes since the last snapshot.</p>
+            <p id="no-changes-block" class="no-changes-text hidden">No changes since your last snapshot. Go to <strong>Dimensions</strong> to adjust your profile and come back here to record what changed.</p>
+
+            <!-- Import success notice -->
+            <div id="import-notice" class="import-notice hidden"></div>
 
             <!-- Snapshot timeline -->
             <div id="timeline"></div>
@@ -164,10 +167,8 @@
 
             <!-- Import -->
             <p class="import-row">
-              <label class="import-label">
-                Load existing badge
-                <input type="file" id="import-file" accept=".svg" class="file-input-hidden">
-              </label>
+              <button type="button" id="import-trigger" class="import-label">Load existing badge</button>
+              <input type="file" id="import-file" accept=".svg" class="file-input-hidden">
             </p>
 
           </div>

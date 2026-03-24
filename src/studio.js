@@ -353,6 +353,7 @@ function recordSnapshot() {
   saveSnapshot(description, document.getElementById('evidence-url').value.trim())
   descEl.value = ''
   document.getElementById('evidence-url').value = ''
+  document.getElementById('import-notice').classList.add('hidden')
   renderTimeline()
   updateBadgeTab()
   updateBadgeDot()
@@ -453,9 +454,15 @@ async function importBadge(file) {
 
   document.getElementById('preview-bar').classList.add('hidden')
   renderTimeline()
+  updateBadgeTab()
+  updateBadgeDot()
   render()
 
-  // Switch to Badge tab to show the loaded history
+  const count = snapshots.length
+  const noticeEl = document.getElementById('import-notice')
+  noticeEl.textContent = `Loaded ${count} snapshot${count === 1 ? '' : 's'}. Adjust your dimensions, then come back here to record what changed.`
+  noticeEl.classList.remove('hidden')
+
   switchTab('badge')
 }
 
@@ -519,6 +526,10 @@ export function initStudio() {
   document.getElementById('record-btn').addEventListener('click', recordSnapshot)
   document.getElementById('record-first-btn').addEventListener('click', recordFirstSnapshot)
   document.getElementById('export-badge-btn').addEventListener('click', exportBadge)
+
+  document.getElementById('import-trigger').addEventListener('click', () => {
+    document.getElementById('import-file').click()
+  })
 
   document.getElementById('import-file').addEventListener('change', e => {
     const file = e.target.files[0]

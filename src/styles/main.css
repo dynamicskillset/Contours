@@ -621,6 +621,16 @@ select:focus-visible {
   color: var(--color-accent-dark);
 }
 
+.import-notice {
+  padding: 0.6rem 0.75rem;
+  background: color-mix(in srgb, var(--color-accent) 10%, transparent);
+  border-left: 3px solid var(--color-accent);
+  border-radius: 4px;
+  font-size: var(--text-sm);
+  color: var(--color-text);
+  line-height: 1.4;
+}
+
 /* ── Error messages ── */
 .issue-error {
   margin: 0;
