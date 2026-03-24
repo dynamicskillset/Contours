@@ -96,10 +96,6 @@ body {
   box-shadow:
     0 1px 3px color-mix(in srgb, var(--color-text) 8%, transparent),
     0 4px 12px color-mix(in srgb, var(--color-text) 6%, transparent);
-  /* Sticky on desktop — disabled on mobile via media query */
-  position: sticky;
-  top: 1rem;
-  z-index: 10;
 }
 
 #output {
@@ -655,11 +651,7 @@ select:focus-visible {
   color: var(--color-accent);
 }
 
-/* ── Responsive: disable sticky on small screens ── */
 @media (max-width: 680px) {
-  .svg-panel {
-    position: static;
-  }
 
   .wrapper {
     padding: 0.75rem 0.75rem 0.5rem;
