@@ -67,7 +67,6 @@ export function buildCredential({
         name:      snap.description,
         narrative: tag,
         ...(snap.url ? { url: snap.url } : {}),
-        created:   snap.timestamp,
       }
     })
   }

@@ -101,7 +101,7 @@ function renderOverlayLegend() {
     const snap   = snapshots[i]
     const colors = PALETTES[snap.palette] || PALETTES.frost
     const color  = colors.stroke
-    const label  = `Snapshot ${i + 1}: ${truncate(snap.description, 30)}`
+    const label  = truncate(snap.description, 30)
     return `<span class="overlay-legend-item" style="color:${escAttr(color)}"><span class="overlay-legend-swatch"></span>${escAttr(label)}</span>`
   }).join('')
   legendEl.innerHTML =
@@ -456,8 +456,16 @@ function recordSnapshot() {
 
 function recordFirstSnapshot() {
   const descEl  = document.getElementById('evidence-description-intro')
-  const description = descEl.value.trim() || 'Initial profile'
-  const url         = document.getElementById('evidence-url-intro').value.trim()
+  const errorEl = document.getElementById('record-intro-error')
+  const description = descEl.value.trim()
+  if (!description) {
+    errorEl.textContent = 'Describe what this starting profile represents.'
+    errorEl.classList.remove('hidden')
+    descEl.focus()
+    return
+  }
+  errorEl.classList.add('hidden')
+  const url = document.getElementById('evidence-url-intro').value.trim()
   saveSnapshot(description, url)
   descEl.value = ''
   document.getElementById('evidence-url-intro').value = ''
