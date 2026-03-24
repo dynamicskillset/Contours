@@ -86,6 +86,20 @@ export async function generateKeyPair() {
 export async function signCredential(credential, keyPair) {
   const { did, fragment } = await publicKeyToDIDKey(keyPair.publicKey)
 
+  // The credential issuer.id MUST match the verification method controller.
+  // Since we derive a fresh did:key from the signing key, we use that as the issuer id.
+  // The original issuer URL (if any) is preserved as issuer.url for display purposes.
+  const prevIssuerId = credential.issuer?.id
+  const issuerUrl    = prevIssuerId && !prevIssuerId.startsWith('did:') ? prevIssuerId : undefined
+  credential = {
+    ...credential,
+    issuer: {
+      ...credential.issuer,
+      id: did,
+      ...(issuerUrl ? { url: issuerUrl } : {}),
+    },
+  }
+
   // Proof config uses the same @context as the document (per eddsa-rdfc-2022 spec)
   const proofConfig = {
     '@context':         credential['@context'],

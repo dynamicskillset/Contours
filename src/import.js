@@ -35,7 +35,8 @@ export function extractCredential(svgString) {
 export function parseSnapshots(credential) {
   const name        = credential.name || ''
   const issuerName  = credential.issuer?.name || ''
-  const issuerUrl   = credential.issuer?.id   || ''
+  // issuer.url holds the human-readable URL (set during signing); fall back to issuer.id for old badges
+  const issuerUrl   = credential.issuer?.url || (credential.issuer?.id?.startsWith('did:') ? '' : credential.issuer?.id) || ''
   const description = credential.credentialSubject?.achievement?.description || ''
 
   // evidence is top-level per OBv3/VC spec; fall back to credentialSubject.evidence for older badges
