@@ -105,12 +105,13 @@ body {
 #output {
   width: 100%;
   max-width: 480px;
-  aspect-ratio: 1;
+  aspect-ratio: 10 / 9;  /* clips the 64px bottom PAD — labels never reach it */
+  overflow: hidden;
 }
 
 #output svg {
   width: 100%;
-  height: 100%;
+  height: auto;
 }
 
 /* Empty state placeholder */
