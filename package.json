@@ -1,6 +1,6 @@
 {
   "name": "contours",
-  "version": "0.10.0",
+  "version": "0.11.0",
   "description": "Topographic skills-profile visualiser for Open Badges",
   "license": "AGPL-3.0-only",
   "scripts": {

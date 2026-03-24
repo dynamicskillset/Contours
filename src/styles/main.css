@@ -53,7 +53,7 @@ body {
 
 /* ── Wrapper ── */
 .wrapper {
-  max-width: 640px;
+  max-width: 1120px;
   width: 100%;
   margin: 0 auto;
   padding: 1.5rem 1.25rem 0.5rem;
@@ -83,6 +83,15 @@ body {
   gap: 1rem;
 }
 
+@media (min-width: 860px) {
+  .main {
+    display: grid;
+    grid-template-columns: 1fr 420px;
+    align-items: start;
+    gap: 1.5rem;
+  }
+}
+
 /* ── SVG panel ── */
 .svg-panel {
   background-color: var(--color-surface);
@@ -98,11 +107,24 @@ body {
     0 4px 12px color-mix(in srgb, var(--color-text) 6%, transparent);
 }
 
+@media (min-width: 860px) {
+  .svg-panel {
+    position: sticky;
+    top: 1.5rem;
+  }
+}
+
 #output {
   width: 100%;
   max-width: 480px;
   aspect-ratio: 10 / 9;  /* clips the 64px bottom PAD — labels never reach it */
   overflow: hidden;
+}
+
+@media (min-width: 860px) {
+  #output {
+    max-width: none;
+  }
 }
 
 #output svg {
@@ -618,27 +640,97 @@ select:focus-visible {
   text-decoration: underline;
 }
 
+/* ── Overlay legend ── */
+.overlay-legend {
+  width: 100%;
+  max-width: 480px;
+  padding: 0.4rem 0.6rem;
+  background: color-mix(in srgb, var(--color-accent) 8%, transparent);
+  border: 1px solid color-mix(in srgb, var(--color-accent) 20%, transparent);
+  border-radius: 6px;
+  font-size: var(--text-sm);
+  color: var(--color-text-secondary);
+}
+
+@media (min-width: 860px) {
+  .overlay-legend {
+    max-width: none;
+  }
+}
+
+.overlay-legend-inner {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 0.3em 0.6em;
+}
+
+.overlay-legend-label {
+  font-weight: 600;
+  color: var(--color-text-secondary);
+  font-size: 0.75rem;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  flex-shrink: 0;
+}
+
+.overlay-legend-item {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.3em;
+  font-size: var(--text-sm);
+}
+
+.overlay-legend-swatch {
+  display: inline-block;
+  width: 1.5em;
+  height: 2px;
+  border-top: 2px dashed currentColor;
+  flex-shrink: 0;
+}
+
+.overlay-legend-clear {
+  margin-left: auto;
+  padding: 0;
+  background: none;
+  border: none;
+  cursor: pointer;
+  font: inherit;
+  font-size: var(--text-sm);
+  color: var(--color-accent);
+  text-decoration: underline;
+  text-underline-offset: 2px;
+  flex-shrink: 0;
+}
+
+.overlay-legend-clear:hover {
+  color: var(--color-accent-dark);
+}
+
 /* ── Badge export section ── */
 .badge-export-section {
   margin-bottom: 0.5rem;
 }
 
-/* ── Import ── */
-.import-row {
-  position: relative;
-  margin: 0;
+/* ── Import section (Export tab) ── */
+.import-section {
+  padding-bottom: 1em;
+  border-bottom: 1px solid var(--color-border-light);
+  margin-bottom: 0.5em;
+}
+
+.import-section-label {
+  margin: 0 0 0.5em;
+  font-weight: 600;
   font-size: var(--text-sm);
+  color: var(--color-text-secondary);
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
 }
 
-.import-label {
-  color: var(--color-accent);
-  cursor: pointer;
-  text-decoration: underline;
-  text-underline-offset: 2px;
-}
-
-.import-label:hover {
-  color: var(--color-accent-dark);
+.import-btn {
+  width: 100%;
+  justify-content: center;
 }
 
 .import-notice {
@@ -718,7 +810,7 @@ select:focus-visible {
   flex-shrink: 0;
 }
 
-@media (max-width: 680px) {
+@media (max-width: 500px) {
 
   .wrapper {
     padding: 0.75rem 0.75rem 0.5rem;

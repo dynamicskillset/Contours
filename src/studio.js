@@ -1,4 +1,4 @@
-import { renderContour } from './contour.js'
+import { renderContour, PALETTES } from './contour.js'
 import { buildCredential } from './credential.js'
 import { generateKeyPair, signCredential, isEd25519Supported } from './signing.js'
 import { extractCredential, parseSnapshots } from './import.js'
@@ -50,6 +50,34 @@ function readAxes() {
   }))
 }
 
+function renderOverlayLegend() {
+  const legendEl = document.getElementById('overlay-legend')
+  const active   = [...overlayIndices].filter(i => i !== previewIndex)
+  if (active.length === 0) {
+    legendEl.classList.add('hidden')
+    return
+  }
+  const items = active.map(i => {
+    const snap   = snapshots[i]
+    const colors = PALETTES[snap.palette] || PALETTES.frost
+    const color  = colors.stroke
+    const label  = `Snapshot ${i + 1}: ${truncate(snap.description, 30)}`
+    return `<span class="overlay-legend-item" style="color:${escAttr(color)}"><span class="overlay-legend-swatch"></span>${escAttr(label)}</span>`
+  }).join('')
+  legendEl.innerHTML =
+    `<div class="overlay-legend-inner">` +
+    `<span class="overlay-legend-label">Comparing:</span>` +
+    items +
+    `<button type="button" class="overlay-legend-clear">Clear all</button>` +
+    `</div>`
+  legendEl.classList.remove('hidden')
+  legendEl.querySelector('.overlay-legend-clear').addEventListener('click', () => {
+    overlayIndices.clear()
+    render()
+    renderTimeline()
+  })
+}
+
 function render() {
   const axes = previewIndex >= 0 ? snapshots[previewIndex].axes    : readAxes()
   const pal  = previewIndex >= 0 ? snapshots[previewIndex].palette : palette
@@ -59,13 +87,14 @@ function render() {
   const svg  = renderContour(axes, pal, false, null, overlays)
   outputEl.innerHTML = svg
   svgActionsEl.classList.toggle('hidden', !svg)
+  renderOverlayLegend()
   updateBadgeTab()
   updateBadgeDot()
 }
 
 // ── Tab switching ──────────────────────────────────────────────────────────────
 
-const TABS = ['dimensions', 'settings', 'badge']
+const TABS = ['dimensions', 'settings', 'record', 'export']
 let activeTab = 'dimensions'
 
 function switchTab(name) {
@@ -75,7 +104,7 @@ function switchTab(name) {
     document.getElementById(`tab-btn-${t}`).setAttribute('aria-selected', t === name)
     document.getElementById(`tab-${t}`).classList.toggle('hidden', t !== name)
   })
-  if (name === 'badge') updateBadgeTab()
+  if (name === 'record') updateBadgeTab()
 }
 
 // ── Change detection ──────────────────────────────────────────────────────────
@@ -106,7 +135,7 @@ function updateBadgeDot() {
 }
 
 function updateBadgeTab() {
-  if (activeTab !== 'badge') return
+  if (activeTab !== 'record') return
 
   const intro        = document.getElementById('badge-intro')
   const draftBlock   = document.getElementById('draft-block')
@@ -217,7 +246,7 @@ function loadFramework(key) {
 
   list.innerHTML = ''
   for (const axis of template) {
-    const value = fw ? Math.round(10 + Math.random() * 85) : axis.value
+    const value = axis.value
     list.appendChild(createAxisRow({ label: axis.label, value }))
   }
   updateRemoveButtons()
@@ -420,12 +449,13 @@ async function exportBadge() {
 
     let credential = buildCredential({ name, axes, palette: pal, evidence: snapshots, issuerName, issuerUrl })
 
-    if (await isEd25519Supported()) {
-      const keyPair = await generateKeyPair()
-      credential = await signCredential(credential, keyPair)
-    } else {
-      console.warn('Ed25519 not available — exporting unsigned credential.')
+    if (!await isEd25519Supported()) {
+      errorEl.textContent = 'Your browser does not support Ed25519 signing. Please use a modern browser (Chrome, Firefox, or Safari) to export a signed badge.'
+      errorEl.classList.remove('hidden')
+      return
     }
+    const keyPair = await generateKeyPair()
+    credential = await signCredential(credential, keyPair)
 
     const svg  = renderContour(axes, pal, true, credential)
     if (!svg) return
@@ -480,7 +510,7 @@ async function importBadge(file) {
   noticeEl.textContent = `Loaded ${count} snapshot${count === 1 ? '' : 's'}. Adjust your dimensions, then come back here to record what changed.`
   noticeEl.classList.remove('hidden')
 
-  switchTab('badge')
+  switchTab('record')
 }
 
 // ── Init ───────────────────────────────────────────────────────────────────────

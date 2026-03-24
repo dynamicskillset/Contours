@@ -23,10 +23,11 @@
             <button type="button" id="exit-preview-btn" class="preview-exit-btn">Back to current</button>
           </div>
           <div id="output"></div>
+          <div id="overlay-legend" class="overlay-legend hidden"></div>
           <div class="svg-actions hidden" id="svg-actions">
             <button type="button" id="download-svg-btn" class="btn-secondary">Download SVG</button>
             <button type="button" id="download-png-btn" class="btn-secondary">Download PNG</button>
-            <p class="save-hint">Nothing is saved automatically. Use the <strong>Badge</strong> tab to export your profile — including full history — as a file you can reload later.</p>
+            <p class="save-hint">Nothing is saved automatically. Use the <strong>Export</strong> tab to save your profile as a file you can reload later.</p>
           </div>
         </div>
 
@@ -40,9 +41,11 @@
             <button class="tab-btn" role="tab" aria-selected="false"
                     aria-controls="tab-settings" id="tab-btn-settings">Settings</button>
             <button class="tab-btn" role="tab" aria-selected="false"
-                    aria-controls="tab-badge" id="tab-btn-badge">
-              Badge<span class="tab-dot hidden" id="badge-tab-dot" aria-hidden="true"></span>
+                    aria-controls="tab-record" id="tab-btn-record">
+              Record<span class="tab-dot hidden" id="badge-tab-dot" aria-hidden="true"></span>
             </button>
+            <button class="tab-btn" role="tab" aria-selected="false"
+                    aria-controls="tab-export" id="tab-btn-export">Export</button>
           </div>
 
           <!-- Dimensions tab -->
@@ -94,8 +97,11 @@
 
           </div>
 
-          <!-- Badge tab -->
-          <div id="tab-badge" role="tabpanel" aria-labelledby="tab-btn-badge" class="tab-panel hidden">
+          <!-- Record tab -->
+          <div id="tab-record" role="tabpanel" aria-labelledby="tab-btn-record" class="tab-panel hidden">
+
+            <!-- Import success notice -->
+            <div id="import-notice" class="import-notice hidden"></div>
 
             <!-- First-visit intro (shown when no snapshots exist) -->
             <div id="badge-intro" class="badge-intro hidden">
@@ -134,13 +140,24 @@
             <!-- No unsaved changes -->
             <p id="no-changes-block" class="no-changes-text hidden">No changes since your last snapshot. Go to <strong>Dimensions</strong> to adjust your profile and come back here to record what changed.</p>
 
-            <!-- Import success notice -->
-            <div id="import-notice" class="import-notice hidden"></div>
-
             <!-- Snapshot timeline -->
             <div id="timeline"></div>
 
-            <!-- Badge profile and export -->
+          </div>
+
+          <!-- Export tab -->
+          <div id="tab-export" role="tabpanel" aria-labelledby="tab-btn-export" class="tab-panel hidden">
+
+            <!-- Import existing badge (prominent at top) -->
+            <div class="import-section">
+              <p class="import-section-label">Returning user?</p>
+              <p class="item">
+                <button type="button" id="import-trigger" class="btn-secondary import-btn">Load existing badge</button>
+                <input type="file" id="import-file" accept=".svg" class="file-input-hidden">
+              </p>
+            </div>
+
+            <!-- Export as Open Badge -->
             <div class="badge-export-section">
               <p class="label badge-section-label">Export as Open Badge</p>
 
@@ -165,19 +182,13 @@
               <p id="export-badge-error" class="issue-error hidden"></p>
             </div>
 
-            <!-- Import -->
-            <p class="import-row">
-              <button type="button" id="import-trigger" class="import-label">Load existing badge</button>
-              <input type="file" id="import-file" accept=".svg" class="file-input-hidden">
-            </p>
-
           </div>
         </div>
       </main>
     </div>
 
     <footer class="footer">
-      <span class="footer-version">v0.10.0</span>
+      <span class="footer-version">v0.11.0</span>
       <span class="footer-sep">·</span>
       <a href="https://dynamicskillset.com" rel="noopener" class="footer-link">A Dynamic Skillset tool</a>
       <span class="footer-sep">·</span>
