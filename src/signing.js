@@ -67,13 +67,15 @@ export async function signCredential(credential, keyPair) {
     proofPurpose:       'assertionMethod',
   }
 
-  // Signing input: canonicalize(proofHeader) || canonicalize(credential)
-  const enc       = new TextEncoder()
-  const proofBytes = enc.encode(canonicalize(proofHeader))
-  const credBytes  = enc.encode(canonicalize(credential))
-  const toSign     = new Uint8Array(proofBytes.length + credBytes.length)
-  toSign.set(proofBytes)
-  toSign.set(credBytes, proofBytes.length)
+  // eddsa-jcs-2022: hashData = SHA-256(JCS(proofConfig)) || SHA-256(JCS(document))
+  const enc = new TextEncoder()
+  const [proofHash, credHash] = await Promise.all([
+    crypto.subtle.digest('SHA-256', enc.encode(canonicalize(proofHeader))),
+    crypto.subtle.digest('SHA-256', enc.encode(canonicalize(credential))),
+  ])
+  const toSign = new Uint8Array(64)
+  toSign.set(new Uint8Array(proofHash))
+  toSign.set(new Uint8Array(credHash), 32)
 
   const sigBytes = new Uint8Array(
     await crypto.subtle.sign('Ed25519', keyPair.privateKey, toSign)

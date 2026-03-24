@@ -23,6 +23,7 @@ export function buildCredential({
   issuedAt = new Date().toISOString(),
 }) {
   const credId        = `urn:uuid:${crypto.randomUUID()}`
+  const subjectId     = `urn:uuid:${crypto.randomUUID()}`
   const achievementId = `urn:uuid:${crypto.randomUUID()}`
 
   const axesText    = axes.map(a => `${a.label} ${a.value}%`).join(', ')
@@ -38,16 +39,17 @@ export function buildCredential({
     type: ['VerifiableCredential', 'OpenBadgeCredential'],
     issuer: {
       id:   issuerUrl,
-      type: 'Profile',
+      type: ['Profile'],
       name: issuerName,
     },
     validFrom: issuedAt,
     name,
     credentialSubject: {
-      type: 'AchievementSubject',
+      id:   subjectId,
+      type: ['AchievementSubject'],
       achievement: {
         id:          achievementId,
-        type:        'Achievement',
+        type:        ['Achievement'],
         name,
         description,
         criteria:    { narrative },
@@ -56,15 +58,16 @@ export function buildCredential({
   }
 
   if (evidence.length > 0) {
-    credential.credentialSubject.evidence = evidence.map(snap => {
+    // evidence is a top-level credential property per the OBv3 / VC Data Model spec
+    credential.evidence = evidence.map(snap => {
       const tag = `[contours:v1:${snap.palette}:${snap.axes.map(a => `${a.label}=${a.value}`).join(',')}]`
       return {
-        id:       snap.id,
-        type:     ['Evidence'],
-        name:     snap.description,
-        ...(snap.url ? { description: snap.url } : {}),
+        id:        snap.id,
+        type:      ['Evidence'],
+        name:      snap.description,
         narrative: tag,
-        created:  snap.timestamp,
+        ...(snap.url ? { url: snap.url } : {}),
+        created:   snap.timestamp,
       }
     })
   }

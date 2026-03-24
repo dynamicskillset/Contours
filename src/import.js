@@ -38,7 +38,8 @@ export function parseSnapshots(credential) {
   const issuerUrl   = credential.issuer?.id   || ''
   const description = credential.credentialSubject?.achievement?.description || ''
 
-  const rawEvidence = credential.credentialSubject?.evidence || []
+  // evidence is top-level per OBv3/VC spec; fall back to credentialSubject.evidence for older badges
+  const rawEvidence = credential.evidence || credential.credentialSubject?.evidence || []
   const snapshots   = rawEvidence.flatMap(ev => {
     const parsed = parseContoursTag(ev.narrative)
     if (!parsed) return []
@@ -46,7 +47,7 @@ export function parseSnapshots(credential) {
       id:          ev.id || `urn:uuid:${crypto.randomUUID()}`,
       timestamp:   ev.created || new Date().toISOString(),
       description: ev.name || '',
-      url:         ev.description || '',
+      url:         ev.url || ev.description || '',  // ev.description was the old field name
       axes:        parsed.axes,
       palette:     parsed.palette,
     }]

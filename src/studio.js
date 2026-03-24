@@ -50,6 +50,46 @@ function readAxes() {
   }))
 }
 
+function renderCompareBar() {
+  const barEl = document.getElementById('compare-bar')
+  if (snapshots.length < 2) {
+    barEl.classList.add('hidden')
+    return
+  }
+  const allActive = snapshots.every((_, i) => overlayIndices.has(i))
+  const buttons = snapshots.map((snap, i) => {
+    const colors  = PALETTES[snap.palette] || PALETTES.frost
+    const active  = overlayIndices.has(i)
+    const label   = truncate(snap.description, 20)
+    return `<button type="button" class="compare-btn${active ? ' is-active' : ''}" data-compare-index="${i}" title="${escAttr(truncate(snap.description, 40))}" style="--compare-color:${escAttr(colors.stroke)}">
+      <span class="compare-swatch"></span>${escAttr(label)}
+    </button>`
+  }).join('')
+
+  barEl.innerHTML =
+    `<span class="compare-label">Compare:</span>` +
+    `<div class="compare-btns">${buttons}</div>` +
+    `<button type="button" class="compare-all-btn">${allActive ? 'Clear all' : 'All'}</button>`
+  barEl.classList.remove('hidden')
+
+  barEl.querySelectorAll('.compare-btn').forEach(btn => {
+    btn.addEventListener('click', () => {
+      const i = parseInt(btn.dataset.compareIndex, 10)
+      if (overlayIndices.has(i)) overlayIndices.delete(i)
+      else overlayIndices.add(i)
+      render()
+      renderTimeline()
+    })
+  })
+
+  barEl.querySelector('.compare-all-btn').addEventListener('click', () => {
+    if (allActive) overlayIndices.clear()
+    else snapshots.forEach((_, i) => overlayIndices.add(i))
+    render()
+    renderTimeline()
+  })
+}
+
 function renderOverlayLegend() {
   const legendEl = document.getElementById('overlay-legend')
   const active   = [...overlayIndices].filter(i => i !== previewIndex)
@@ -87,6 +127,7 @@ function render() {
   const svg  = renderContour(axes, pal, false, null, overlays)
   outputEl.innerHTML = svg
   svgActionsEl.classList.toggle('hidden', !svg)
+  renderCompareBar()
   renderOverlayLegend()
   document.getElementById('welcome-hint').classList.toggle('hidden', snapshots.length > 0 || lastSavedAxes !== null)
   updateBadgeTab()
@@ -157,13 +198,16 @@ function updateBadgeTab() {
   noChanges.classList.toggle('hidden', draft)
 
   if (draft) {
-    const diff    = computeDiff(lastSavedAxes, readAxes())
-    const diffEl  = document.getElementById('draft-diff')
-    diffEl.innerHTML = diff.map(d => {
-      if (d.isNew) return `<li>${escAttr(d.label)} <em>(new)</em></li>`
-      const sign = d.delta > 0 ? '+' : ''
-      const cls  = d.delta > 0 ? 'positive' : 'negative'
-      return `<li class="${cls}">${escAttr(d.label)} ${sign}${d.delta}</li>`
+    const diff   = computeDiff(lastSavedAxes, readAxes())
+    const diffEl = document.getElementById('draft-diff')
+    diffEl.innerHTML = diff.flatMap(d => {
+      if (d.isNew) return [`<li>${escAttr(d.label)} <em>(new)</em></li>`]
+      // Convert normalised delta (0–100 space) to the user's current scale
+      const displayDelta = Math.round((d.delta / 100) * scale)
+      if (displayDelta === 0) return []
+      const sign = displayDelta > 0 ? '+' : ''
+      const cls  = displayDelta > 0 ? 'positive' : 'negative'
+      return [`<li class="${cls}">${escAttr(d.label)} ${sign}${displayDelta}</li>`]
     }).join('')
   }
 }
@@ -413,8 +457,7 @@ function recordSnapshot() {
 function recordFirstSnapshot() {
   const descEl  = document.getElementById('evidence-description-intro')
   const description = descEl.value.trim() || 'Initial profile'
-  const url     = document.getElementById('evidence-url-intro').value.trim()
-
+  const url         = document.getElementById('evidence-url-intro').value.trim()
   saveSnapshot(description, url)
   descEl.value = ''
   document.getElementById('evidence-url-intro').value = ''
