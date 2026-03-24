@@ -5,3 +5,5 @@ dist/
 *.md
 !README.md
 !CHANGELOG.md
+.playwright-mcp/
+*.png

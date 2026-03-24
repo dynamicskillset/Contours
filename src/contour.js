@@ -63,9 +63,11 @@ function splitLabel(text) {
  *
  * @param {Array<{label: string, value: number}>} axes  — min 3, max ~8
  * @param {string} palette  — key of PALETTES
+ * @param {boolean} attribution  — include attribution text (exports only)
+ * @param {object|null} credential  — OBv3 credential to bake in (exports only)
  * @returns {string}  SVG markup
  */
-export function renderContour(axes, palette = 'nord', attribution = false) {
+export function renderContour(axes, palette = 'nord', attribution = false, credential = null) {
   if (!axes || axes.length < 3) return ''
 
   const n = axes.length
@@ -76,7 +78,8 @@ export function renderContour(axes, palette = 'nord', attribution = false) {
 
   const parts = []
   const VB = SVG_SIZE + PAD * 2   // 608
-  parts.push(`<svg xmlns="http://www.w3.org/2000/svg" viewBox="${-PAD} ${-PAD} ${VB} ${VB}" role="img" aria-labelledby="contour-title">`)
+  const obNs = credential ? ' xmlns:openbadges="https://purl.imsglobal.org/ob/v3p0"' : ''
+  parts.push(`<svg xmlns="http://www.w3.org/2000/svg"${obNs} viewBox="${-PAD} ${-PAD} ${VB} ${VB}" role="img" aria-labelledby="contour-title">`)
   parts.push(`<title id="contour-title">${escXml(titleText)}</title>`)
   parts.push(`<rect x="${-PAD}" y="${-PAD}" width="${VB}" height="${VB}" fill="${colors.bg}"/>`)
 
@@ -149,6 +152,11 @@ export function renderContour(axes, palette = 'nord', attribution = false) {
   // Attribution (exports only)
   if (attribution) {
     parts.push(`<text x="${CX}" y="${SVG_SIZE - 14}" text-anchor="middle" font-family="system-ui, sans-serif" font-size="9" fill="${colors.guide}" opacity="0.5">dynamicskillset.com/contours</text>`)
+  }
+
+  // Baked OBv3 credential (exports only — invisible to SVG renderers)
+  if (credential) {
+    parts.push(`<openbadges:credential><![CDATA[${JSON.stringify(credential)}]]></openbadges:credential>`)
   }
 
   parts.push('</svg>')

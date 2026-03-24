@@ -14,66 +14,170 @@
         <h1 class="title">Contours</h1>
       </header>
 
-      <div class="content" id="studio">
-        <form id="input">
-          <h2 class="subtitle">Configuration</h2>
+      <main class="main">
 
-          <label class="label" for="framework-select">Framework</label>
-          <p class="item">
-            <select name="framework" id="framework-select">
-              <option value="">— None —</option>
-              <option value="digcomp">DigComp 3.0</option>
-            </select>
-          </p>
-          <p class="framework-link hidden" id="framework-link-row">
-            <a id="framework-link" href="" target="_blank" rel="noopener" class="framework-link-anchor">About this framework</a>
-          </p>
-
-          <label class="label" for="palette-select">Colour</label>
-          <p class="item">
-            <select name="palette" id="palette-select">
-              <option value="frost">Blue</option>
-              <option value="red">Red</option>
-              <option value="orange">Orange</option>
-              <option value="yellow">Yellow</option>
-              <option value="green">Green</option>
-              <option value="purple">Purple</option>
-            </select>
-          </p>
-
-          <label class="label" for="scale-select">Value Scale</label>
-          <p class="item">
-            <select name="scale" id="scale-select">
-              <option value="100">0–100</option>
-              <option value="10">0–10</option>
-              <option value="8">0–8</option>
-            </select>
-          </p>
-
-          <p class="label">Dimensions <span class="label-hint">(min 3, max 8)</span></p>
-          <div id="axes-list"></div>
-
-          <p class="item">
-            <button type="button" id="add-axis" class="btn-secondary">+ Add dimension</button>
-          </p>
-        </form>
-
-        <div id="output-area">
+        <!-- SVG panel — sticky on desktop -->
+        <div class="svg-panel">
+          <div id="preview-bar" class="hidden">
+            <span id="preview-label"></span>
+            <button type="button" id="exit-preview-btn" class="preview-exit-btn">Back to current</button>
+          </div>
           <div id="output"></div>
-          <div id="output-actions" class="hidden">
+          <div class="svg-actions hidden" id="svg-actions">
             <button type="button" id="download-svg-btn" class="btn-secondary">Download SVG</button>
-            <button type="button" id="download-png-btn" class="btn-primary">Download PNG</button>
+            <button type="button" id="download-png-btn" class="btn-secondary">Download PNG</button>
           </div>
         </div>
-      </div>
+
+        <!-- Controls panel -->
+        <div class="controls-panel">
+
+          <!-- Tab bar -->
+          <div class="tab-bar" role="tablist" aria-label="Controls">
+            <button class="tab-btn is-active" role="tab" aria-selected="true"
+                    aria-controls="tab-dimensions" id="tab-btn-dimensions">Dimensions</button>
+            <button class="tab-btn" role="tab" aria-selected="false"
+                    aria-controls="tab-settings" id="tab-btn-settings">Settings</button>
+            <button class="tab-btn" role="tab" aria-selected="false"
+                    aria-controls="tab-badge" id="tab-btn-badge">
+              Badge<span class="tab-dot hidden" id="badge-tab-dot" aria-hidden="true"></span>
+            </button>
+          </div>
+
+          <!-- Dimensions tab -->
+          <div id="tab-dimensions" role="tabpanel" aria-labelledby="tab-btn-dimensions" class="tab-panel">
+
+            <label class="label" for="framework-select">Framework</label>
+            <p class="item">
+              <select name="framework" id="framework-select">
+                <option value="">— None —</option>
+                <option value="digcomp">DigComp 3.0</option>
+              </select>
+            </p>
+            <p class="framework-link hidden" id="framework-link-row">
+              <a id="framework-link" href="" target="_blank" rel="noopener" class="framework-link-anchor">About this framework</a>
+            </p>
+
+            <p class="label">Dimensions <span class="label-hint">(min 3, max 8)</span></p>
+            <div id="axes-list"></div>
+
+            <p class="item">
+              <button type="button" id="add-axis" class="btn-secondary">+ Add dimension</button>
+            </p>
+
+          </div>
+
+          <!-- Settings tab -->
+          <div id="tab-settings" role="tabpanel" aria-labelledby="tab-btn-settings" class="tab-panel hidden">
+
+            <label class="label" for="palette-select">Colour</label>
+            <p class="item">
+              <select name="palette" id="palette-select">
+                <option value="frost">Blue</option>
+                <option value="red">Red</option>
+                <option value="orange">Orange</option>
+                <option value="yellow">Yellow</option>
+                <option value="green">Green</option>
+                <option value="purple">Purple</option>
+              </select>
+            </p>
+
+            <label class="label" for="scale-select">Value Scale</label>
+            <p class="item">
+              <select name="scale" id="scale-select">
+                <option value="100">0–100</option>
+                <option value="10">0–10</option>
+                <option value="8">0–8</option>
+              </select>
+            </p>
+
+          </div>
+
+          <!-- Badge tab -->
+          <div id="tab-badge" role="tabpanel" aria-labelledby="tab-btn-badge" class="tab-panel hidden">
+
+            <!-- First-visit intro (shown when no snapshots exist) -->
+            <div id="badge-intro" class="badge-intro hidden">
+              <p class="badge-intro-text">Record how your skills develop over time. Each snapshot captures your current profile with a note on what changed. Snapshots are baked into your exported Open Badge.</p>
+              <label class="label" for="evidence-description-intro">What does this starting profile represent?</label>
+              <p class="item">
+                <textarea id="evidence-description-intro" rows="2" placeholder="e.g. Self-assessment at the start of the programme…"></textarea>
+              </p>
+              <label class="label" for="evidence-url-intro">Supporting link <span class="label-hint">(optional)</span></label>
+              <p class="item">
+                <input type="url" id="evidence-url-intro" placeholder="https://…">
+              </p>
+              <p class="item">
+                <button type="button" id="record-first-btn" class="btn-secondary">Save first snapshot</button>
+              </p>
+            </div>
+
+            <!-- Unsaved changes (shown when axes have changed since last snapshot) -->
+            <div id="draft-block" class="draft-block hidden">
+              <p class="draft-heading">Unsaved changes</p>
+              <ul id="draft-diff" class="draft-diff"></ul>
+              <label class="label" for="evidence-description">What changed?</label>
+              <p class="item">
+                <textarea id="evidence-description" rows="2" placeholder="Describe what happened or what you learnt…"></textarea>
+              </p>
+              <label class="label" for="evidence-url">Supporting link <span class="label-hint">(optional)</span></label>
+              <p class="item">
+                <input type="url" id="evidence-url" placeholder="https://…">
+              </p>
+              <p class="item evidence-actions">
+                <button type="button" id="record-btn" class="btn-secondary">Save snapshot</button>
+                <span id="record-error" class="issue-error hidden"></span>
+              </p>
+            </div>
+
+            <!-- No unsaved changes -->
+            <p id="no-changes-block" class="no-changes-text hidden">No unsaved changes since the last snapshot.</p>
+
+            <!-- Snapshot timeline -->
+            <div id="timeline"></div>
+
+            <!-- Badge profile and export -->
+            <div class="badge-export-section">
+              <p class="label badge-section-label">Export as Open Badge</p>
+
+              <label class="label" for="badge-name">Profile name <span class="label-hint">(required)</span></label>
+              <p class="item">
+                <input type="text" id="badge-name" placeholder="e.g. Digital Competence Profile" maxlength="80">
+              </p>
+
+              <label class="label" for="badge-issuer-name">Issuer name</label>
+              <p class="item">
+                <input type="text" id="badge-issuer-name" value="Dynamic Skillset" maxlength="80">
+              </p>
+
+              <label class="label" for="badge-issuer-url">Issuer URL</label>
+              <p class="item">
+                <input type="url" id="badge-issuer-url" value="https://dynamicskillset.com">
+              </p>
+
+              <p class="item">
+                <button type="button" id="export-badge-btn" class="btn-primary">Export as Open Badge</button>
+              </p>
+              <p id="export-badge-error" class="issue-error hidden"></p>
+            </div>
+
+            <!-- Import -->
+            <p class="import-row">
+              <label for="import-file" class="import-label">Load existing badge</label>
+              <input type="file" id="import-file" accept=".svg" class="hidden" aria-label="Load an existing Open Badge SVG file">
+            </p>
+
+          </div>
+        </div>
+      </main>
     </div>
 
     <footer class="footer">
-      <span class="footer-version">v0.9.0</span>
+      <span class="footer-version">v0.10.0</span>
       <span class="footer-sep">·</span>
       <a href="https://dynamicskillset.com" rel="noopener" class="footer-link">A Dynamic Skillset tool</a>
       <span class="footer-sep">·</span>
-      <a href="https://github.com/dynamicskillset/contours" rel="noopener" class="footer-link">Mozilla Public License, v2.0</a>
+      <a href="https://github.com/dynamicskillset/contours" rel="noopener" class="footer-link">GNU AGPL v3</a>
     </footer>
 
     <!-- Off-screen anchor for programmatic downloads -->
