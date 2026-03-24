@@ -632,6 +632,14 @@ select:focus-visible {
   display: none !important;
 }
 
+.file-input-hidden {
+  position: absolute;
+  width: 0;
+  height: 0;
+  opacity: 0;
+  overflow: hidden;
+}
+
 /* ── Footer ── */
 .footer {
   display: flex;
