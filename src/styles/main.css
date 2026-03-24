@@ -826,6 +826,27 @@ select:focus-visible {
   margin-bottom: 0.5rem;
 }
 
+.export-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+}
+
+.export-json-hint {
+  margin: 0.25em 0 0;
+  font-size: var(--text-sm);
+  color: var(--color-text-secondary);
+}
+
+.inline-link {
+  color: var(--color-accent);
+  text-decoration: none;
+}
+
+.inline-link:hover {
+  text-decoration: underline;
+}
+
 /* ── Import section (Export tab) ── */
 .import-section {
   padding-bottom: 1em;

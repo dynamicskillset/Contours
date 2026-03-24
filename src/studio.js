@@ -472,46 +472,65 @@ function slugify(text) {
   return text.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '') || 'badge'
 }
 
-async function exportBadge() {
-  const nameEl  = document.getElementById('badge-name')
-  const errorEl = document.getElementById('export-badge-error')
-  const name    = nameEl.value.trim()
-
+// Shared: validate form, build and sign the credential. Returns signed credential or null.
+async function buildSignedCredential(errorEl) {
+  const nameEl = document.getElementById('badge-name')
+  const name   = nameEl.value.trim()
   if (!name) {
-    errorEl.textContent = 'Profile name is required to export as Open Badge.'
+    errorEl.textContent = 'Profile name is required.'
     errorEl.classList.remove('hidden')
     nameEl.focus()
-    return
+    return null
   }
   errorEl.classList.add('hidden')
 
-  const btn = document.getElementById('export-badge-btn')
+  if (!await isEd25519Supported()) {
+    errorEl.textContent = 'Your browser does not support Ed25519 signing. Please use a modern browser (Chrome, Firefox, or Safari).'
+    errorEl.classList.remove('hidden')
+    return null
+  }
+
+  const axes       = snapshots.length > 0 ? snapshots[snapshots.length - 1].axes    : readAxes()
+  const pal        = snapshots.length > 0 ? snapshots[snapshots.length - 1].palette : palette
+  const issuerName = document.getElementById('badge-issuer-name').value.trim() || 'Dynamic Skillset'
+  const issuerUrl  = document.getElementById('badge-issuer-url').value.trim()  || 'https://dynamicskillset.com'
+
+  const credential = buildCredential({ name, axes, palette: pal, evidence: snapshots, issuerName, issuerUrl })
+  const keyPair    = await generateKeyPair()
+  return { signed: await signCredential(credential, keyPair), name, axes, pal }
+}
+
+async function exportBadge() {
+  const errorEl = document.getElementById('export-badge-error')
+  const btn     = document.getElementById('export-badge-btn')
   btn.disabled = true
   btn.textContent = 'Signing…'
-
   try {
-    const axes = snapshots.length > 0 ? snapshots[snapshots.length - 1].axes    : readAxes()
-    const pal  = snapshots.length > 0 ? snapshots[snapshots.length - 1].palette : palette
-
-    const issuerName = document.getElementById('badge-issuer-name').value.trim() || 'Dynamic Skillset'
-    const issuerUrl  = document.getElementById('badge-issuer-url').value.trim()  || 'https://dynamicskillset.com'
-
-    let credential = buildCredential({ name, axes, palette: pal, evidence: snapshots, issuerName, issuerUrl })
-
-    if (!await isEd25519Supported()) {
-      errorEl.textContent = 'Your browser does not support Ed25519 signing. Please use a modern browser (Chrome, Firefox, or Safari) to export a signed badge.'
-      errorEl.classList.remove('hidden')
-      return
-    }
-    const keyPair = await generateKeyPair()
-    credential = await signCredential(credential, keyPair)
-
-    const svg  = renderContour(axes, pal, true, credential)
+    const result = await buildSignedCredential(errorEl)
+    if (!result) return
+    const { signed, axes, pal } = result
+    const svg = renderContour(axes, pal, true, signed)
     if (!svg) return
-    triggerDownload(URL.createObjectURL(new Blob([svg], { type: 'image/svg+xml' })), `${slugify(name)}.svg`)
+    triggerDownload(URL.createObjectURL(new Blob([svg], { type: 'image/svg+xml' })), `${slugify(result.name)}.svg`)
   } finally {
     btn.disabled = false
     btn.textContent = 'Export as Open Badge'
+  }
+}
+
+async function exportCredentialJSON() {
+  const errorEl = document.getElementById('export-badge-error')
+  const btn     = document.getElementById('export-json-btn')
+  btn.disabled = true
+  btn.textContent = 'Signing…'
+  try {
+    const result = await buildSignedCredential(errorEl)
+    if (!result) return
+    const json = JSON.stringify(result.signed, null, 2)
+    triggerDownload(URL.createObjectURL(new Blob([json], { type: 'application/json' })), `${slugify(result.name)}.json`)
+  } finally {
+    btn.disabled = false
+    btn.textContent = 'Download credential JSON'
   }
 }
 
@@ -622,6 +641,7 @@ export function initStudio() {
   document.getElementById('record-btn').addEventListener('click', recordSnapshot)
   document.getElementById('record-first-btn').addEventListener('click', recordFirstSnapshot)
   document.getElementById('export-badge-btn').addEventListener('click', exportBadge)
+  document.getElementById('export-json-btn').addEventListener('click', exportCredentialJSON)
 
   document.getElementById('import-trigger').addEventListener('click', () => {
     document.getElementById('import-file').click()
