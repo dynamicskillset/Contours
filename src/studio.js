@@ -520,6 +520,11 @@ export function initStudio() {
   document.getElementById('record-first-btn').addEventListener('click', recordFirstSnapshot)
   document.getElementById('export-badge-btn').addEventListener('click', exportBadge)
 
+  document.querySelector('label[for="import-file"]').addEventListener('click', e => {
+    e.preventDefault()
+    document.getElementById('import-file').click()
+  })
+
   document.getElementById('import-file').addEventListener('change', e => {
     const file = e.target.files[0]
     if (file) importBadge(file)
