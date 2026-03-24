@@ -651,6 +651,19 @@ select:focus-visible {
   color: var(--color-accent);
 }
 
+.footer-github {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.3em;
+}
+
+.github-icon {
+  width: 1em;
+  height: 1em;
+  fill: currentColor;
+  flex-shrink: 0;
+}
+
 @media (max-width: 680px) {
 
   .wrapper {
