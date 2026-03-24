@@ -310,6 +310,27 @@ function triggerDownload(objectUrl, filename) {
   setTimeout(() => URL.revokeObjectURL(objectUrl), 100)
 }
 
+function renderThumbnail(axes, pal, size) {
+  const svgString = renderContour(axes, pal, false)
+  if (!svgString) return Promise.resolve(null)
+  return new Promise(resolve => {
+    const url = URL.createObjectURL(new Blob([svgString], { type: 'image/svg+xml' }))
+    const img = new Image()
+    img.onload = () => {
+      const canvas = document.createElement('canvas')
+      canvas.width = canvas.height = size
+      const ctx = canvas.getContext('2d')
+      ctx.fillStyle = '#ffffff'
+      ctx.fillRect(0, 0, size, size)
+      ctx.drawImage(img, 0, 0, size, size)
+      URL.revokeObjectURL(url)
+      resolve(canvas.toDataURL('image/png'))
+    }
+    img.onerror = () => { URL.revokeObjectURL(url); resolve(null) }
+    img.src = url
+  })
+}
+
 function downloadSVG() {
   const src = renderContour(readAxes(), palette, true)
   if (!src) return
@@ -503,7 +524,9 @@ async function buildSignedCredential(errorEl) {
   const issuerName = document.getElementById('badge-issuer-name').value.trim() || 'Dynamic Skillset'
   const issuerUrl  = document.getElementById('badge-issuer-url').value.trim()  || 'https://dynamicskillset.com'
 
-  const credential = buildCredential({ name, axes, palette: pal, evidence: snapshots, issuerName, issuerUrl })
+  const description = document.getElementById('badge-description').value.trim()
+  const image       = await renderThumbnail(axes, pal, 1024)
+  const credential  = buildCredential({ name, description, axes, palette: pal, evidence: snapshots, issuerName, issuerUrl, image })
   const keyPair    = await generateKeyPair()
   return { signed: await signCredential(credential, keyPair), name, axes, pal }
 }

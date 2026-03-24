@@ -11,6 +11,7 @@
  * @param {string} opts.issuerName
  * @param {string} opts.issuerUrl
  * @param {string} [opts.issuedAt]
+ * @param {string} [opts.image]     — data URI for the badge thumbnail image
  */
 export function buildCredential({
   name,
@@ -21,14 +22,39 @@ export function buildCredential({
   issuerName,
   issuerUrl,
   issuedAt = new Date().toISOString(),
+  image = null,
 }) {
   const credId        = `urn:uuid:${crypto.randomUUID()}`
   const subjectId     = `urn:uuid:${crypto.randomUUID()}`
   const achievementId = `urn:uuid:${crypto.randomUUID()}`
 
-  const axesText    = axes.map(a => `${a.label} ${a.value}%`).join(', ')
-  const contoursTag = `[contours:v1:${palette}:${axes.map(a => `${a.label}=${a.value}`).join(',')}]`
-  const narrative   = `Skills profile: ${axesText}\n${contoursTag}`
+  const axesText  = axes.map(a => `${a.label} ${a.value}%`).join(', ')
+  const snapCount = evidence.length
+
+  let narrative
+  if (snapCount > 1) {
+    const first = evidence[0]
+    const progressText = axes.map(a => {
+      const prev = first.axes.find(fa => fa.label === a.label)
+      if (!prev) return `${a.label} ${a.value}%`
+      const delta = a.value - prev.value
+      return `${a.label} ${prev.value}%\u2192${a.value}% (${delta >= 0 ? '+' : ''}${delta}pp)`
+    }).join(', ')
+    narrative = `Topographic skills profile with ${snapCount} snapshots. Progress: ${progressText}.`
+  } else if (snapCount === 1) {
+    narrative = `Topographic skills profile recorded at one point in time. Current: ${axesText}.`
+  } else {
+    narrative = `Topographic skills profile: ${axesText}.`
+  }
+
+  const achievement = {
+    id:       achievementId,
+    type:     ['Achievement'],
+    name,
+    criteria: { narrative },
+    ...(description  ? { description }                          : {}),
+    ...(image        ? { image: { id: image, type: ['Image'] } } : {}),
+  }
 
   const credential = {
     '@context': [
@@ -47,25 +73,21 @@ export function buildCredential({
     credentialSubject: {
       id:   subjectId,
       type: ['AchievementSubject'],
-      achievement: {
-        id:          achievementId,
-        type:        ['Achievement'],
-        name,
-        description,
-        criteria:    { narrative },
-      },
+      achievement,
     },
   }
 
   if (evidence.length > 0) {
     // evidence is a top-level credential property per the OBv3 / VC Data Model spec
     credential.evidence = evidence.map(snap => {
-      const tag = `[contours:v1:${snap.palette}:${snap.axes.map(a => `${a.label}=${a.value}`).join(',')}]`
+      const tag      = `[contours:v1:${snap.palette}:${snap.axes.map(a => `${a.label}=${a.value}`).join(',')}]`
+      const snapAxes = snap.axes.map(a => `${a.label} ${a.value}%`).join(', ')
       return {
-        id:        snap.id,
-        type:      ['Evidence'],
-        name:      snap.description,
-        narrative: tag,
+        id:          snap.id,
+        type:        ['Evidence'],
+        name:        snap.description,
+        description: snapAxes,
+        narrative:   tag,
         ...(snap.url ? { url: snap.url } : {}),
       }
     })
