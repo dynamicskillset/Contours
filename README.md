@@ -1,3 +1,3 @@
 # Contours
 
-Moved to https://framagit.org/dynamicskillset/sightlines/
+Moved to https://framagit.org/dynamicskillset/contours
