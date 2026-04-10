@@ -1,13 +1,28 @@
-name: Deploy to VPS
+name: Deploy to Mac Mini
 
 on:
   push:
     branches: [main]
   workflow_dispatch:
 
+concurrency:
+  group: deploy-contours
+  cancel-in-progress: false
+
 jobs:
   deploy:
-    uses: dynamicskillset/.github/.github/workflows/deploy-static-site.yml@main
-    with:
-      deploy-path: /opt/ghost/sites/dynamicskillset.com/contours
-    secrets: inherit
+    runs-on: [self-hosted, mac-mini]
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: npm
+
+      - run: npm ci
+
+      - run: npm run build
+
+      - name: Deploy dist
+        run: rsync -a --delete dist/ ~/docker/contours/dist/

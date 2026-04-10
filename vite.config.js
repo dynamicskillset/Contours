@@ -4,7 +4,7 @@ import path from 'path'
 export default defineConfig(({ mode }) => ({
   root: '.',
   publicDir: 'public',
-  base: mode === 'production' ? '/contours/' : '/',
+  base: '/',
   resolve: {
     alias: {
       // rdf-canonize ships browser substitutes via its "browser" package.json field,

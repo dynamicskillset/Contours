@@ -59,10 +59,12 @@ The contour algorithm (`src/contour.js`):
 
 ## Deployment
 
-- VPS: `root@80.78.23.57`, path `/opt/ghost/sites/dynamicskillset.com/contours/`
-- CI/CD: `.github/workflows/deploy.yml` — push to `master` triggers build + rsync
-- Secrets needed: `VPS_HOST`, `VPS_SSH_KEY` (same as badge-studio, shared at org level)
-- Live at: dynamicskillset.com/contours (once deployed)
+- Mac Mini: `doug@192.168.0.5`, served via nginx container at `~/docker/contours/`
+- CI/CD: `.github/workflows/deploy.yml` — push to `main` triggers build + rsync via self-hosted runner on Mac Mini
+- Self-hosted runner: `~/actions-runner/` on Mac Mini, registered as `mac-mini`, running as launchd service
+- No secrets needed — runner runs locally, rsync is to `~/docker/contours/dist/`
+- Live at: `contours.dynamicskillset.com` (routed via Cloudflare Tunnel → `http://contours:80`)
+- `base` in `vite.config.js` is `/` (subdomain, not a subpath)
 
 ## State & Progress
 
